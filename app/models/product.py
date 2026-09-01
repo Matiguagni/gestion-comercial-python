@@ -2,6 +2,20 @@ class Product:
     def __init__(
         self, id: int, nombre: str, precio: float, stock: int, categoria: str
     ):
+        if id <= 0:
+            raise ValueError(
+                "Error, el id no puede iniciar con valor menor o igual a 0"
+            )
+        if not nombre.strip():
+            raise ValueError("Error, nombre de producto vacio")
+        if precio <= 0:
+            raise ValueError("Error, formato de precio incorrecto")
+        if stock <= 0:
+            raise ValueError("Error, cantidad de stock incorrecta")
+        if not categoria.strip():
+            raise ValueError("Error, categoria vacia")
+        # A posterior podria comprobarse si pertenece a la lista de categorias.
+
         self.id = id
         self.nombre = nombre
         self.precio = precio

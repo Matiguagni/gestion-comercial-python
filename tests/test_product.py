@@ -14,6 +14,38 @@ def product():
     )
 
 
+def test_producto_valido(product):
+    assert product.id == 1
+    assert product.nombre == "Mouse"
+    assert product.precio == 20000
+    assert product.stock == 10
+    assert product.categoria == "Perifericos"
+
+
+@pytest.mark.parametrize(
+    "campo, valor, mensaje",
+    [
+        ("id", 0, "Error, el id no puede iniciar con valor menor o igual a 0"),
+        ("nombre", " ", "Error, nombre de producto vacio"),
+        ("precio", 0, "Error, formato de precio incorrecto"),
+        ("stock", -2, "Error, cantidad de stock incorrecta"),
+        ("categoria", "", "Error, categoria vacia"),
+    ],
+)
+def test_producto_constructor_invalido(campo, valor, mensaje):
+    datos = {
+        "id": 1,
+        "nombre": "Mouse",
+        "precio": 20000,
+        "stock": 10,
+        "categoria": "Perifericos",
+    }
+    datos[campo] = valor
+
+    with pytest.raises(ValueError, match=mensaje):
+        Product(**datos)
+
+
 def test_reducir_stock(product):
     product.reducir_stock(2)
     assert product.stock == 8
