@@ -2,7 +2,7 @@ import pytest
 
 from app.models.client import Client
 from app.models.product import Product
-from app.models.sale import Sale
+from app.models.sale import Sale, SaleStatus
 from app.models.sale_detail import SaleDetail
 
 
@@ -27,6 +27,7 @@ def test_sale_valido(cliente1, venta1):
     assert venta1.id == 1
     assert venta1.cliente == cliente1
     assert venta1.detalles == []
+    assert venta1.estado == SaleStatus.PENDIENTE
 
 
 @pytest.fixture
@@ -104,3 +105,45 @@ def test_sale_constructor_invalido(cliente1, campo, valor, mensaje):
 def test_agregar_detalle_invalido(venta1, detalle, mensaje):
     with pytest.raises(ValueError, match=mensaje):
         venta1.agregar_detalle(detalle)
+
+
+def test_pagar_valido(venta1):
+    venta1.pagar()
+    assert venta1.estado == SaleStatus.PAGADA
+
+
+def test_cancelar_valido(venta1):
+    venta1.cancelar()
+    assert venta1.estado == SaleStatus.CANCELADA
+
+
+def test_entregar_valido(venta1):
+    venta1.pagar()
+    venta1.entregar()
+    assert venta1.estado == SaleStatus.ENTREGADA
+
+
+def test_pagar_invalido(venta1):
+    venta1.cancelar()
+    with pytest.raises(
+        ValueError, match="Error, la venta no puede ser pagada"
+    ):
+        venta1.pagar()
+    assert venta1.estado == SaleStatus.CANCELADA
+
+
+def test_cancelar_invalido(venta1):
+    venta1.pagar()
+    with pytest.raises(
+        ValueError, match="Error, la venta no puede ser cancelada"
+    ):
+        venta1.cancelar()
+    assert venta1.estado == SaleStatus.PAGADA
+
+
+def test_entregar_invalido(venta1):
+    with pytest.raises(
+        ValueError, match="Error, la venta no puede ser entregada"
+    ):
+        venta1.entregar()
+    assert venta1.estado == SaleStatus.PENDIENTE
