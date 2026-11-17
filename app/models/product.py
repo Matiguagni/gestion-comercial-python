@@ -10,7 +10,7 @@ class Product:
             raise ValueError("Error, nombre de producto vacio")
         if precio <= 0:
             raise ValueError("Error, formato de precio incorrecto")
-        if stock <= 0:
+        if stock < 0:
             raise ValueError("Error, cantidad de stock incorrecta")
         if not categoria.strip():
             raise ValueError("Error, categoria vacia")
@@ -35,6 +35,9 @@ class Product:
         self.precio = nuevo_precio
 
     def cambiar_categoria(self, categoria: str) -> None:
+        if not categoria.strip():
+           raise ValueError("Error, categoria vacia") 
+        
         self.categoria = categoria
 
     def aplicar_descuento(self, descuento: int) -> None:

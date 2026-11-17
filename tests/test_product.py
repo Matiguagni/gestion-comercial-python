@@ -85,3 +85,46 @@ def test_aplicar_descuento_invalido(product):
     ):
         product.aplicar_descuento(101)
     assert product.precio == 20000
+
+@pytest.fixture
+def product2():
+    return Product(
+        id=2,
+        nombre="mouse_pad",
+        precio=40000,
+        stock=0,
+        categoria="Perifericos",
+    )
+
+def test_producto_stock_cero(product2):
+    assert product2.id == 2
+    assert product2.nombre == "mouse_pad"
+    assert product2.precio == 40000
+    assert product2.stock == 0
+    assert product2.categoria == "Perifericos"
+
+def test_rechazar_stock_negativo(product2):
+    with pytest.raises(
+        ValueError,
+        match="Error, cantidad de stock incorrecta"
+    ):
+        Product(
+            id=3,
+            nombre="Teclado",
+            precio=30000,
+            stock=-12,
+            categoria="Perifericos",
+        )
+
+def test_cambiar_categoria_invalida(product2):
+    with pytest.raises(
+        ValueError,
+        match="Error, categoria vacia"
+    ):
+        product2.cambiar_categoria("   ")
+    assert product2.categoria == "Perifericos"
+
+def test_cambiar_categoria(product2):
+    product2.cambiar_categoria("Placas de video")
+    
+    assert product2.categoria == "Placas de video"
