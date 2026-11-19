@@ -79,26 +79,30 @@ def test_cliente_nombre_vacio():
 
 
 def test_cliente_email_vacio():
-    with pytest.raises(ValueError, match="Error, email vacio"):
-        Client(
-            id=123,
-            dni="12345678",
-            nombre_completo="Matias Raigg",
-            email="",
-            direccion="Calle falsa 123",
-            codigo_postal="3500",
+    with pytest.raises(
+        ValueError,
+        match="Error, formato del email incorrecto"):
+            Client(
+                id=123,
+                dni="12345678",
+                nombre_completo="Matias Raigg",
+                email="",
+                direccion="Calle falsa 123",
+                codigo_postal="3500",
         )
 
 
 def test_cliente_email_formato_invalido():
-    with pytest.raises(ValueError, match="Error, formato incorrecto de email"):
-        Client(
-            id=123,
-            dni="12345678",
-            nombre_completo="Matias Raigg",
-            email="matgmail.com",
-            direccion="Calle falsa 123",
-            codigo_postal="3500",
+    with pytest.raises(
+        ValueError,
+        match="Error, formato del email incorrecto"):
+            Client(
+                id=123,
+                dni="12345678",
+                nombre_completo="Matias Raigg",
+                email="matgmail.com",
+                direccion="Calle falsa 123",
+                codigo_postal="3500",
         )
 
 
@@ -140,23 +144,69 @@ def test_actualizar_nombre_invalido(client):
     assert client.nombre_completo == "Matias Raigg"
 
 
+def test_actualizar_nombre_con_espacios(client):
+    client.actualizar_nombre("         Matias Guagni                ")
+    assert client.nombre_completo == "Matias Guagni"
+
+
 def test_actualizar_email(client):
     client.actualizar_email("matias@gmail.com")
     assert client.email == "matias@gmail.com"
 
 
 def test_actualizar_email_vacio(client):
-    with pytest.raises(ValueError, match="Error, nuevo email vacio"):
-        client.actualizar_email("")
-    assert client.email == "mat@gmail.com"
-
-
-def test_actualizar_email_formato_invalido(client):
     with pytest.raises(
-        ValueError, match="Error en el formato del nuevo email"
-    ):
-        client.actualizar_email("matiasgmail.com")
+        ValueError,
+        match="Error, formato del email incorrecto"):
+            client.actualizar_email("")
     assert client.email == "mat@gmail.com"
+
+def test_actualizar_email_con_espacios(client):
+    client.actualizar_email("    matiasgua@gmail.com     ")
+    assert client.email == "matiasgua@gmail.com"
+
+def test_actualizar_email_sin_arroba(client):
+    with pytest.raises(
+        ValueError, match="Error, formato del email incorrecto"
+    ):
+        client.actualizar_email("matiasgmail.com.ar")
+    assert client.email == "mat@gmail.com"
+
+def test_actualizar_email_sinContenido_antesDe_arroba(client):
+    with pytest.raises(
+        ValueError, match="Error, formato del email incorrecto"
+    ):
+        client.actualizar_email("@gmail.com.ar")
+    assert client.email == "mat@gmail.com"
+
+def test_actualizar_email_sinContenido_despuesDe_arroba(client):
+    with pytest.raises(
+        ValueError, match="Error, formato del email incorrecto"
+    ):
+        client.actualizar_email("matias@.com.ar")
+    assert client.email == "mat@gmail.com"
+
+def test_actualizar_email_sin_punto_dominio(client):
+    with pytest.raises(
+        ValueError, match="Error, formato del email incorrecto"
+    ):
+        client.actualizar_email("matias@gmailcom")
+    assert client.email == "mat@gmail.com"
+
+def test_actualizar_email_con_dos_arrobas(client):
+    with pytest.raises(
+        ValueError, match="Error, formato del email incorrecto"
+    ):
+        client.actualizar_email("matias@@gmail.com")
+    assert client.email == "mat@gmail.com"
+
+def test_actualizar_email_con_espacios_internos(client):
+    with pytest.raises(
+        ValueError, match="Error, formato del email incorrecto"
+    ):
+        client.actualizar_email("matias@ gmail.com")
+    assert client.email == "mat@gmail.com"
+
 
 
 def test_actualizar_direccion(client):
