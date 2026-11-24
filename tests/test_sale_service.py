@@ -31,6 +31,17 @@ def mouse():
 
 
 @pytest.fixture
+def mouse_stock_10():
+    return Product(
+        id=1,
+        nombre="mouse",
+        precio=30000,
+        stock=10,
+        categoria="Perifericos",
+    )
+
+
+@pytest.fixture
 def mouse_sin_stock():
     return Product(
         id=1234, nombre="mouse", precio=30000, stock=1, categoria="Perifericos"
@@ -51,6 +62,27 @@ def teclado():
 @pytest.fixture
 def detalle_mouse(mouse):
     return SaleDetail(producto=mouse, cantidad=2)
+
+
+@pytest.fixture
+def detalle_mouse_6(mouse_stock_10):
+    return SaleDetail(producto=mouse_stock_10, cantidad=6)
+
+
+@pytest.fixture
+def detalle_mouse_66(mouse_stock_10):
+    return SaleDetail(producto=mouse_stock_10, cantidad=6)
+
+
+@pytest.fixture
+def venta_producto_repetido_sin_stock(
+    cliente,
+    detalle_mouse_6,
+    detalle_mouse_66):
+    venta = Sale(id=123, cliente=cliente)
+    venta.agregar_detalle(detalle_mouse_6)
+    venta.agregar_detalle(detalle_mouse_66)
+    return venta
 
 
 @pytest.fixture
@@ -139,3 +171,14 @@ def test_confirmar_venta_sin_detalles(sale_service, venta_sin_detalles):
     with pytest.raises(ValueError, match="Error, venta sin detalles"):
         sale_service.confirmar_venta(venta_sin_detalles)
     assert venta_sin_detalles.estado == SaleStatus.PENDIENTE
+
+
+def test_confirmar_venta_con_producto_repetido_y_stock_insuficiente(
+    sale_service,
+    mouse_stock_10,
+    venta_producto_repetido_sin_stock,
+):
+    with pytest.raises(ValueError, match="Error, stock insuficiente"):
+        sale_service.confirmar_venta(venta_producto_repetido_sin_stock)
+    assert venta_producto_repetido_sin_stock.estado == SaleStatus.PENDIENTE
+    assert mouse_stock_10.stock == 10
