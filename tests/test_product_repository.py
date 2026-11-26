@@ -99,3 +99,10 @@ def test_obtener_por_id_invalido(repository, id_invalido):
 def test_eliminar_id_invalido(repository, id_invalido):
     with pytest.raises(ValueError, match="Error, id invalido"):
         repository.eliminar(id_invalido)
+
+
+def test_guardar_producto_existente(repository, mouse):
+    repository.guardar(mouse)
+
+    with pytest.raises(ValueError, match="Error, producto existente"):
+        repository.guardar(mouse)
